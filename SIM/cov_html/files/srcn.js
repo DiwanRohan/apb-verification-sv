@@ -1,2 +1,0 @@
-var g_data = ["","../ENV/apb_inf.sv","../TEST/apb_pkg.sv","../ENV/apb_coverage.sv","../ENV/sv_sequence_item.sv","../ENV/apb_trans.sv","../ENV/apb_gen_base.sv","../ENV/apb_rand_xtn.svh","../ENV/apb_directed_xtn.svh","../ENV/apb_boundary_xtn.svh","../ENV/apb_transition_xtn.svh","../ENV/apb_wr_rd_same_xtn.svh","../ENV/apb_cov_xtn.svh","../ENV/apb_driver.sv","../ENV/apb_monitor.sv","../ENV/apb_ref_model.sv","../ENV/apb_scoreboard.sv","../ENV/apb_env.sv","../TEST/apb_base_test.sv","../TOP/apb_tb_top.sv","../RTL/apb_slave.sv"];
-processSrcNamesData(g_data);

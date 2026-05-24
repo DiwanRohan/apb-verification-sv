@@ -1,0 +1,10 @@
+work/
+transcript
+*.wlf
+*.log
+*.jou
+*.str
+*.vcd
+*.fsdb
+*.ucdb
+modelsim.ini

@@ -8,3 +8,6 @@ transcript
 *.fsdb
 *.ucdb
 modelsim.ini
+wlft*
+*.vstf
+cov_html/

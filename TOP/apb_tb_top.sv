@@ -105,7 +105,7 @@ module apb_tb_top;
   final begin
     if ((test.env.scb.fail_cnt == 0) && (test.env.scb.pass_cnt > 0)) begin
       $display(" ==========    ==========   ==========   ========== ");
-      $display(" =        =    =        =   =            =	         ");
+      $display(" =        =    =        =   =            =          ");
       $display(" =        =    =        =   =            =          ");
       $display(" ==========    ==========   ==========   ========== ");
       $display(" =             =        =            =            = ");
@@ -115,11 +115,11 @@ module apb_tb_top;
     end else begin
       $display(" ==========   ==========    ==========   =          ");
       $display(" =            =        =        =        =          ");
-      $display(" =            =        =        =        =	         ");
+      $display(" =            =        =        =        =          ");
       $display(" ==========   ==========        =        =          ");
       $display(" =            =        =        =        =          ");
-      $display(" =            =        =        =        =	         ");
-      $display(" =            =        =        =        =	         ");
+      $display(" =            =        =        =        =          ");
+      $display(" =            =        =        =        =         ");
       $display(" =            =        =    ==========   ===========");
     end
     $display("Pass_cnt = %0d", test.env.scb.pass_cnt);

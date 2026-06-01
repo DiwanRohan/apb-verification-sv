@@ -13,8 +13,7 @@
 
 
 `ifndef SV_SEQUENCE_ITEM
-`define SV_SEQUENCE_ITEM 
-
+`define SV_SEQUENCE_ITEM
 
 //This enforces how the objects are copied
 //              how the objects are duplicated

@@ -1,6 +1,5 @@
 `ifndef APB_SLAVE_SV
-`define APB_SLAVE_SV 
-
+`define APB_SLAVE_SV
 
 `include "apb_defines.sv"
 `include "apb_pkg.sv"
@@ -65,7 +64,7 @@ module apb_slave (
   //READ
   always_comb begin
 
-    if (!prstn) prdata <= 'x;
+    if (!prstn) prdata = 'x;
 
     else if (psel && penable && pready && !pwrite && (paddr < `DEPTH)) prdata = mem[paddr];
 

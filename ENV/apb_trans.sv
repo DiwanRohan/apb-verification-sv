@@ -12,8 +12,7 @@
 /////////////////////////////////////
 
 `ifndef APB_TRANS_SV
-`define APB_TRANS_SV 
-
+`define APB_TRANS_SV
 
 `include "apb_defines.sv"
 

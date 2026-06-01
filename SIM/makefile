@@ -12,7 +12,7 @@ TOP = $(TOP_DIR)/apb_tb_top.sv
 TOP_MODULE = apb_tb_top
 
 # ===== TEST SELECTION =====
-TEST ?= APB_DIRECTED_TEST
+TEST ?= APB_RAND_TEST
 SEED ?= random
 
 # ===== COVERAGE FILE =====
@@ -62,3 +62,9 @@ cov_gui:
 # ===== CLEAN =====
 clean:
 	rm -rf work transcript vsim.wlf *.ucdb
+
+regress:
+	make run TEST=APB_DIRECTED_TEST
+	make run TEST=APB_RANDOM_TEST SEED=1
+	make run TEST=APB_RANDOM_TEST SEED=2
+	make run TEST=APB_RANDOM_TEST SEED=3

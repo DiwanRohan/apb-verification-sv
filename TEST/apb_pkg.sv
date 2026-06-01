@@ -1,7 +1,7 @@
 ///////////////////////////////////
 //
-//------------------HEADER--------------------- 
-//FILE NAME: apb_base_test.sv 
+//------------------HEADER---------------------
+//FILE NAME: apb_base_test.sv
 //AUTHOR NAME: Rohan Diwan
 //CLASS NAME: apb_base_test
 //DESCRIPTION: this includes all files of environment
@@ -25,14 +25,14 @@ package apb_pkg;
   int raise_ctr = 0;
   bit reset = 0;
 
-  function void raise_objection();
+  function automatic void raise_objection();
     raise_ctr++;
-    $display("[OBJECTION] Raised -> count = %0d",raise_ctr);
+    $display("[OBJECTION] Raised -> count = %0d", raise_ctr);
   endfunction
 
-  function void drop_objection();
+  function automatic void drop_objection();
     raise_ctr--;
-    $display("[OBJECTION] Dropped -> count = %0d",raise_ctr);
+    $display("[OBJECTION] Dropped -> count = %0d", raise_ctr);
   endfunction
 
 
@@ -50,21 +50,21 @@ package apb_pkg;
   `include "apb_transition_xtn.svh"
   `include "apb_wr_rd_same_xtn.svh"
   `include "apb_cov_xtn.svh"
- 
-  
+
+
   //components
   `include "apb_driver.sv"
   `include "apb_monitor.sv"
   `include "apb_ref_model.sv"
   `include "apb_coverage.sv"
   `include "apb_scoreboard.sv"
-  
+
   //environment
   `include "apb_env.sv"
 
   //test
   `include "apb_base_test.sv"
-  
+
 
 endpackage
 

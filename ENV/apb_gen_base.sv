@@ -1,7 +1,7 @@
 ///////////////////////////////////
 //
-//------------------HEADER--------------------- 
-//FILE NAME: apb_gen.sv 
+//------------------HEADER---------------------
+//FILE NAME: apb_gen.sv
 //AUTHOR NAME: Rohan Diwan
 //CLASS NAME: apb_gen
 //DESCRIPTION: Responsible for stimulus/traffic (transaction items) generation and keep the same in mailbox which is further processed by driver i.e., stimulus generation could be through randomization (preferred), through a file, hardcoded values, DPI etc.
@@ -23,10 +23,10 @@ virtual class apb_gen_base;
 
   apb_trans trans;
 
-  function void connect(mailbox #(apb_trans) mbx);
+  function void connect(mailbox#(apb_trans) mbx);
 
-    this.gen2drv_mbx = mbx;   
-    
+    this.gen2drv_mbx = mbx;
+
   endfunction
 
   //abstract run

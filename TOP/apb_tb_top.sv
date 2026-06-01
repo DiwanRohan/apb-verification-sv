@@ -1,60 +1,60 @@
-`include "apb_inf.sv"
+`include "apb_if.sv"
 
 module apb_tb_top;
 
-	//import package
-	import apb_pkg::*;
+  //import package
+  import apb_pkg::*;
 
-	//clock
-	bit pclk;
+  //clock
+  bit pclk;
 
-	//interface instance
-	apb_inf inf(pclk);
+  //interface instance
+  apb_if intf (pclk);
 
-	//test handle
-	apb_base_test test;
+  //test handle
+  apb_base_test test;
 
-	//clock generation
-	initial begin
-		pclk = 0;
-		forever #5 pclk = ~pclk;
-	end
+  //clock generation
+  initial begin
+    pclk = 0;
+    forever #5 pclk = ~pclk;
+  end
 
-	// DUT instantiation
-	apb_slave DUT (
-		.pclk    (pclk),
-		.prstn   (inf.prstn),
-		.psel    (inf.psel),
-		.penable (inf.penable),    
-		.paddr   (inf.paddr),
-		.pwrite  (inf.pwrite),
-		.pwdata  (inf.pwdata),
-		.prdata  (inf.prdata),
-		.pready  (inf.pready),
-		.pslverr (inf.pslverr)
-	);
+  // DUT instantiation
+  apb_slave DUT (
+      .pclk   (pclk),
+      .prstn  (intf.prstn),
+      .psel   (intf.psel),
+      .penable(intf.penable),
+      .paddr  (intf.paddr),
+      .pwrite (intf.pwrite),
+      .pwdata (intf.pwdata),
+      .prdata (intf.prdata),
+      .pready (intf.pready),
+      .pslverr(intf.pslverr)
+  );
 
-  task apply_reset(int count);
+  task static apply_reset(int count);
 
     $display("[%0t] APPLYING RESET", $time);
 
     // notify reset starting
-    -> apb_pkg::reset_start_ev;
-    apb_pkg:reset = 1;
+    ->apb_pkg::reset_start_ev;
+    apb_pkg : reset = 1;
 
-    inf.prstn = 1'b0;
+    intf.prstn = 1'b0;
 
-    inf.psel    = 0;
-    inf.penable = 0;
-    inf.paddr   = 0;
-    inf.pwrite  = 0;
-    inf.pwdata  = 0;
-    //inf.pready  = `DEFAULT_PREADY;
-    //inf.pslverr = 0;
+    intf.psel    = 0;
+    intf.penable = 0;
+    intf.paddr   = 0;
+    intf.pwrite  = 0;
+    intf.pwdata  = 0;
+    //intf.pready  = `DEFAULT_PREADY;
+    //intf.pslverr = 0;
 
-    repeat(count) @(posedge pclk);
+    repeat (count) @(posedge pclk);
 
-    inf.prstn = 1;
+    intf.prstn = 1;
 
     @(posedge pclk);
 
@@ -62,32 +62,32 @@ module apb_tb_top;
 
     // notify reset complete
     apb_pkg::reset = 0;
-    -> apb_pkg::reset_done_ev;
+    ->apb_pkg::reset_done_ev;
 
   endtask
 
-   task run_test();
+  task static run_test();
 
-     apply_reset(1);
+    apply_reset(1);
 
-     test=new();  
+    test = new();
 
-     test.build();
+    test.build();
 
-     test.connect(inf);
+    test.connect(intf);
 
-     test.run();
+    test.run();
 
-     #0;
+    #0;
 
-     wait(apb_pkg::raise_ctr==0);
+    wait (apb_pkg::raise_ctr == 0);
 
-     $display("=== TEST END ===\n");
+    $display("=== TEST END ===\n");
 
-     $finish;
+    $finish;
   endtask
 
-	// test flow
+  // test flow
   initial begin
     run_test();
 
@@ -99,40 +99,39 @@ module apb_tb_top;
         test.env.scb.print("SCB_ACT","SCB_EXP");
         //test.env.gen.print("GEN");
     end
-   */ 
+   */
   end
-   
-  final begin     
-      if ((test.env.scb.fail_cnt == 0) && (test.env.scb.pass_cnt > 0)) begin
-         $display(" ==========    ==========   ==========   ========== ");
-         $display(" =        =    =        =   =            =	         ");  
-         $display(" =        =    =        =   =            =          ");  
-	     $display(" ==========    ==========   ==========   ========== ");
-	     $display(" =             =        =            =            = ");
-         $display(" =             =        =            =            = ");  
-         $display(" =             =        =            =            = "); 
-	     $display(" =             =        =   ==========   ========== ");  
-	    end
-      else begin
-         $display(" ==========   ==========    ==========   =          ");
-         $display(" =            =        =        =        =          "); 
-         $display(" =            =        =        =        =	         "); 
-	     $display(" ==========   ==========        =        =          "); 
-	     $display(" =            =        =        =        =          "); 
-         $display(" =            =        =        =        =	         "); 
-         $display(" =            =        =        =        =	         ");    
-	     $display(" =            =        =    ==========   ===========");
-      end
-      $display("Pass_cnt = %0d",test.env.scb.pass_cnt);
-      $display("Fail_cnt = %0d",test.env.scb.fail_cnt);
-      test.env.cov.report();
-      
-	  end  
+
+  final begin
+    if ((test.env.scb.fail_cnt == 0) && (test.env.scb.pass_cnt > 0)) begin
+      $display(" ==========    ==========   ==========   ========== ");
+      $display(" =        =    =        =   =            =	         ");
+      $display(" =        =    =        =   =            =          ");
+      $display(" ==========    ==========   ==========   ========== ");
+      $display(" =             =        =            =            = ");
+      $display(" =             =        =            =            = ");
+      $display(" =             =        =            =            = ");
+      $display(" =             =        =   ==========   ========== ");
+    end else begin
+      $display(" ==========   ==========    ==========   =          ");
+      $display(" =            =        =        =        =          ");
+      $display(" =            =        =        =        =	         ");
+      $display(" ==========   ==========        =        =          ");
+      $display(" =            =        =        =        =          ");
+      $display(" =            =        =        =        =	         ");
+      $display(" =            =        =        =        =	         ");
+      $display(" =            =        =    ==========   ===========");
+    end
+    $display("Pass_cnt = %0d", test.env.scb.pass_cnt);
+    $display("Fail_cnt = %0d", test.env.scb.fail_cnt);
+    test.env.cov.report();
+
+  end
 
   initial begin
-      $dumpfile("dump.vcd");    
-      $dumpvars();
-    end
+    $dumpfile("dump.vcd");
+    $dumpvars();
+  end
 
-endmodule	
+endmodule
 

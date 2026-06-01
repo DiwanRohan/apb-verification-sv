@@ -1,28 +1,29 @@
 `ifndef APB_SLAVE_SV
-`define APB_SLAVE_SV
+`define APB_SLAVE_SV 
+
 
 `include "apb_defines.sv"
 `include "apb_pkg.sv"
 
 module apb_slave (
 
-  input  logic                     pclk,
-  input  logic                     prstn,
+    input logic pclk,
+    input logic prstn,
 
-  input  logic                     psel,
-  input  logic                     penable,
+    input logic psel,
+    input logic penable,
 
-  input  logic [`ADDR_WIDTH-1:0]   paddr,
-  input  logic                     pwrite,
-  input  logic [`DATA_WIDTH-1:0]   pwdata,
+    input logic [`ADDR_WIDTH-1:0] paddr,
+    input logic                   pwrite,
+    input logic [`DATA_WIDTH-1:0] pwdata,
 
-  output logic                     pready,
-  output logic [`DATA_WIDTH-1:0]   prdata,
-  output logic                     pslverr
+    output logic                   pready,
+    output logic [`DATA_WIDTH-1:0] prdata,
+    output logic                   pslverr
 );
 
   //MEMORY
-  logic [`DATA_WIDTH-1:0] mem [0:`DEPTH-1];
+  logic [`DATA_WIDTH-1:0] mem[`DEPTH];
 
   //WAIT STATE CONTROL
   logic wait_active;
@@ -33,13 +34,13 @@ module apb_slave (
   logic inject_wait;
 
   //CUSTOM WAIT INJECTION
-  integer inject_wait_at;
-  
+  integer INJECT_WAIT_AT;
+
   initial begin
 
     inject_wait = 1'b0;
 
-    #`inject_wait_at;
+    #`INJECT_WAIT_AT;
     inject_wait = 1'b1;
     #2;
 
@@ -53,31 +54,22 @@ module apb_slave (
 
     integer i;
 
-    if(!prstn) begin
+    if (!prstn) begin
 
-      for(i = 0; i < `DEPTH; i++)
-        mem[i] <= 'x;
+      for (i = 0; i < `DEPTH; i++) mem[i] <= 'x;
 
-    end
-
-    else if(psel && penable && pready && pwrite && (paddr < `DEPTH))
-      mem[paddr] <= pwdata;
+    end else if (psel && penable && pready && pwrite && (paddr < `DEPTH)) mem[paddr] <= pwdata;
 
   end
 
   //READ
   always_comb begin
 
-    if(!prstn)
+    if (!prstn) prdata <= 'x;
 
-      prdata <= 'x;
+    else if (psel && penable && pready && !pwrite && (paddr < `DEPTH)) prdata = mem[paddr];
 
-    else if(psel && penable && pready && !pwrite && (paddr < `DEPTH))
-
-      prdata = mem[paddr];
-
-    else
-      prdata = 'x;
+    else prdata = 'x;
 
   end
 
@@ -88,11 +80,10 @@ module apb_slave (
     pready = `DEFAULT_PREADY;
 
     //ACCESS PHASE ONLY
-    if(psel && penable) begin
+    if (psel && penable) begin
 
       // WAIT STATE ACTIVE
-      if(wait_active)
-        pready = 1'b0;
+      if (wait_active) pready = 1'b0;
 
       //READY
       else
@@ -100,30 +91,25 @@ module apb_slave (
 
     end
   end
-  
+
   //WAIT STATE CONTROL
   always_ff @(posedge pclk or negedge prstn) begin
 
-    if(!prstn) begin
+    if (!prstn) begin
       wait_active <= 1'b0;
       wait_cnt    <= 0;
-    end
+    end else begin
 
-    else begin
-	
       //START WAIT
-      if(psel && !penable && inject_wait && !wait_active) begin
+      if (psel && !penable && inject_wait && !wait_active) begin
 
         wait_active <= 1'b1;
         wait_cnt    <= `WAIT_CNT;
 
-      end
+      end  //COUNT WAIT CYCLES
+      else if (wait_active && psel && penable) begin
 
-      //COUNT WAIT CYCLES
-      else if(wait_active && psel && penable) begin
-
-        if(wait_cnt > 1)
-          wait_cnt <= wait_cnt - 1;
+        if (wait_cnt > 1) wait_cnt <= wait_cnt - 1;
 
         else begin
           wait_cnt    <= 0;
@@ -138,8 +124,7 @@ module apb_slave (
 
     pslverr = 1'b0;
 
-    if(psel && penable && (paddr >= `DEPTH))
-      pslverr = 1'b1;
+    if (psel && penable && (paddr >= `DEPTH)) pslverr = 1'b1;
 
   end
 

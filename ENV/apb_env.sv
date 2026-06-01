@@ -1,7 +1,7 @@
 ///////////////////////////////////
 //
-//------------------HEADER--------------------- 
-//FILE NAME: apb_env.sv 
+//------------------HEADER---------------------
+//FILE NAME: apb_env.sv
 //AUTHOR NAME: Rohan Diwan
 //CLASS NAME: apb_env
 //DESCRIPTION: It takes handles of all the verification sub-components, it decalres all the mailboxes, and all the interfaces, it creates everything using the method build, it then takes connect method to call the verification sub-components and finally using the run method it makes all the verification sub-components to run task in parallel
@@ -17,15 +17,15 @@ class apb_env;
 
   //Components
   apb_gen_base gen;
-  apb_driver   drv;
-  apb_monitor  mon;
+  apb_driver drv;
+  apb_monitor mon;
   apb_ref_model rm;
   apb_scoreboard scb;
   apb_coverage cov;
-  
+
   //Virtual Inteface
-  virtual apb_inf.DRV_MP vif;
-  virtual apb_inf.MON_MP vifm;
+  virtual apb_if.DRV_MP vif;
+  virtual apb_if.MON_MP vifm;
 
   //Mailboxes
   mailbox #(apb_trans) gen2drv_mbx;
@@ -37,21 +37,21 @@ class apb_env;
   function build();
     drv = new();
     mon = new();
-    rm  = new();
+    rm = new();
     scb = new();
-	cov = new();
+    cov = new();
 
     gen2drv_mbx = new();
-	mon2ref_mbx = new();
-	mon2scb_mbx = new();
-	ref2scb_mbx = new();
-    
+    mon2ref_mbx = new();
+    mon2scb_mbx = new();
+    ref2scb_mbx = new();
+
   endfunction
 
   //Connect
-  function void connect (virtual apb_inf vif);
+  function void connect(virtual apb_if vif);
 
-    this.vif = vif;
+    this.vif  = vif;
     this.vifm = vif;
     gen.connect(gen2drv_mbx);
     drv.connect(gen2drv_mbx, vif);

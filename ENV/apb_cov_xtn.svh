@@ -4,6 +4,18 @@ class apb_cov_xtn extends apb_gen_base;
 
   bit [`ADDR_WIDTH-1:0] addr;
 
+  localparam longint unsigned DataMaxU = (64'h1 << `DATA_WIDTH) - 1;
+  localparam longint unsigned DataLowMax = (DataMaxU / 4) - 1;
+  localparam longint unsigned DataLowMidMin = DataMaxU / 4;
+  localparam longint unsigned DataLowMidMax = (DataMaxU / 2) - 1;
+  localparam longint unsigned DataHighMidMin = DataMaxU / 2;
+  localparam longint unsigned DataHighMidMax = ((3 * DataMaxU) / 4) - 1;
+  localparam longint unsigned DataHighMin = (3 * DataMaxU) / 4;
+  localparam longint unsigned DataHighMax = DataMaxU;
+  localparam longint unsigned DataQ1 = DataMaxU / 4;
+  localparam longint unsigned DataQ2 = DataMaxU / 2;
+  localparam longint unsigned DataQ3 = (3 * DataMaxU) / 4;
+
   task run();
 
     apb_pkg::raise_objection();
@@ -19,7 +31,7 @@ class apb_cov_xtn extends apb_gen_base;
                   {
                 kind_e == WRITE;
                 paddr inside {[0:(`ADDR_MAX/4)-1]};
-                pwdata inside {[0:(`DATA_MAX/4)-1]};
+                pwdata inside {[0:DataLowMax]};
             })
 
       // LOWMID RANGE WRITE
@@ -27,7 +39,7 @@ class apb_cov_xtn extends apb_gen_base;
                   {
                 kind_e == WRITE;
                 paddr inside {[(`ADDR_MAX/4):(`ADDR_MAX/2)-1]};
-                pwdata inside {[(`DATA_MAX/4):(`DATA_MAX/2)-1]};
+                pwdata inside {[DataLowMidMin:DataLowMidMax]};
             })
 
       // HIGHMID RANGE WRITE
@@ -35,7 +47,7 @@ class apb_cov_xtn extends apb_gen_base;
                   {
                 kind_e == WRITE;
                 paddr inside {[(`ADDR_MAX/2):((3*`ADDR_MAX)/4)-1]};
-                pwdata inside {[(`DATA_MAX/2):((3*`DATA_MAX)/4)-1]};
+                pwdata inside {[DataHighMidMin:DataHighMidMax]};
             })
 
       // HIGH RANGE WRITE
@@ -43,7 +55,7 @@ class apb_cov_xtn extends apb_gen_base;
                   {
                 kind_e == WRITE;
                 paddr inside {[((3*`ADDR_MAX)/4):`ADDR_MAX]};
-                pwdata inside {[((3*`DATA_MAX)/4):`DATA_MAX]};
+                pwdata inside {[DataHighMin:DataHighMax]};
             })
 
     end
@@ -130,10 +142,10 @@ class apb_cov_xtn extends apb_gen_base;
                 paddr == local::addr;
                 pwdata inside {
                     0,
-                    (`DATA_MAX/4),
-                    (`DATA_MAX/2),
-                    ((3*`DATA_MAX)/4),
-                    `DATA_MAX
+                    DataQ1,
+                    DataQ2,
+                    DataQ3,
+                    DataMaxU
                 };
             })
 

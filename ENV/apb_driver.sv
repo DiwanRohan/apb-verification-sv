@@ -32,7 +32,7 @@ class apb_driver;
   //TRANSACTION HANDLE
   apb_trans trans, trans_copy;
 
-  function connect(mailbox#(apb_trans) gen2drv_mbx, virtual apb_if.DRV_MP vif);
+  function void connect(mailbox#(apb_trans) gen2drv_mbx, virtual apb_if.DRV_MP vif);
     this.gen2drv_mbx = gen2drv_mbx;
     this.vif = vif;
   endfunction

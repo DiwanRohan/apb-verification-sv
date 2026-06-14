@@ -2,103 +2,171 @@ import apb_pkg::*;
 
 class apb_coverage;
 
-  apb_trans trans;
+  localparam int unsigned AddrSpace = (1 << `ADDR_WIDTH);
+  localparam int unsigned AddrLowMin = 0;
+  localparam int unsigned AddrLowMax = (AddrSpace / 4) - 1;
+  localparam int unsigned AddrLowMidMin = AddrSpace / 4;
+  localparam int unsigned AddrLowMidMax = (AddrSpace / 2) - 1;
+  localparam int unsigned AddrHighMidMin = AddrSpace / 2;
+  localparam int unsigned AddrHighMidMax = ((3 * AddrSpace) / 4) - 1;
+  localparam int unsigned AddrHighMin = (3 * AddrSpace) / 4;
+  localparam int unsigned AddrHighMax = AddrSpace - 1;
 
-  trans_kind_e prev_kind;
+  localparam bit [`DATA_WIDTH-1:0] DataZero = '0;
+  localparam bit [`DATA_WIDTH-1:0] DataMaxVal = {`DATA_WIDTH{1'b1}};
+  localparam bit [`DATA_WIDTH-1:0] DataQ1Max = DataMaxVal >> 2;
+  localparam bit [`DATA_WIDTH-1:0] DataQ2Max = DataMaxVal >> 1;
+  localparam bit [`DATA_WIDTH-1:0] DataQ3Max = DataQ1Max + DataQ2Max + 1'b1;
 
-  //localparam ADDR_MAX = 2**`ADDR_WIDTH - 1;
-  //localparam DATA_MAX = 2**`DATA_WIDTH - 1;
+  apb_trans last_trans;
 
-  bit addr_written[bit [`ADDR_WIDTH-1:0]];
+  trans_kind_e sample_kind;
+  bit [`ADDR_WIDTH-1:0] sample_paddr;
+  bit [`DATA_WIDTH-1:0] sample_pwdata;
+  bit [`DATA_WIDTH-1:0] sample_prdata;
+  bit sample_pslverr;
+  int unsigned sample_wait_cycles;
 
-  function void sample_coverage(apb_trans trans);
+  int unsigned total_samples;
+  int unsigned write_samples;
+  int unsigned read_samples;
 
-    this.trans = trans.clone();
-    apb_cg.sample();
-
-  endfunction
-
-  covergroup apb_cg;
+  covergroup apb_transfer_cg;
 
     option.per_instance = 1;
+    option.name = "apb_transfer_cg";
 
-    cp_kind: coverpoint trans.kind_e {bins read = {READ}; bins write = {WRITE};}
-
-    cp_paddr: coverpoint trans.paddr {
-      //bins addr[]        = {[0:ADDR_MAX]};
-      bins low_range = {[0 : (`ADDR_MAX / 4) - 1]};
-      bins lowmid_range = {[(`ADDR_MAX / 4) : (`ADDR_MAX / 2) - 1]};
-      bins highmid_range = {[(`ADDR_MAX / 2) : ((3 * `ADDR_MAX) / 4) - 1]};
-      bins high_range = {[((3 * `ADDR_MAX) / 4) : `ADDR_MAX]};
-      bins first_addr = {0};
-      bins last_addr = {`ADDR_MAX};
+    cp_kind: coverpoint sample_kind {
+      bins read  = {READ};
+      bins write = {WRITE};
     }
 
-    cp_pwdata: coverpoint trans.pwdata iff (trans.pwrite) {
-      bins low_range = {[0 : (`DATA_MAX / 4) - 1]};
-      bins lowmid_range = {[(`DATA_MAX / 4) : (`DATA_MAX / 2) - 1]};
-      bins highmid_range = {[(`DATA_MAX / 2) : (3 * `DATA_MAX / 4) - 1]};
-      bins high_range = {[(3 * `DATA_MAX / 4) : `DATA_MAX]};
-      bins first_data = {0};
-      bins max_data = {`DATA_MAX};
+    cp_addr_region: coverpoint sample_paddr {
+      bins low_range     = {[AddrLowMin     : AddrLowMax]};
+      bins lowmid_range  = {[AddrLowMidMin  : AddrLowMidMax]};
+      bins highmid_range = {[AddrHighMidMin : AddrHighMidMax]};
+      bins high_range    = {[AddrHighMin    : AddrHighMax]};
     }
 
-    cp_prdata: coverpoint trans.prdata iff (!trans.pwrite) {
-      bins low_range = {[0 : (`DATA_MAX / 4) - 1]};
-      bins lowmid_range = {[(`DATA_MAX / 4) : (`DATA_MAX / 2) - 1]};
-      bins highmid_range = {[(`DATA_MAX / 2) : (3 * `DATA_MAX / 4) - 1]};
-      bins high_range = {[(3 * `DATA_MAX / 4) : `DATA_MAX]};
-      bins first_data = {0};
-      bins max_data = {`DATA_MAX};
+    cp_addr_boundary: coverpoint sample_paddr {
+      bins first_addr = {AddrLowMin};
+      bins last_addr  = {AddrHighMax};
+      bins other_addr = default;
     }
 
-    cp_transition: coverpoint trans.kind_e {
-      bins wr_to_wr = (WRITE => WRITE);
-      bins wr_to_rd = (WRITE => READ);
-      bins rd_to_wr = (READ => WRITE);
-      bins rd_to_rd = (READ => READ);
+    cp_kind_transition: coverpoint sample_kind {
+      bins write_to_write = (WRITE => WRITE);
+      bins write_to_read  = (WRITE => READ);
+      bins read_to_write  = (READ  => WRITE);
+      bins read_to_read   = (READ  => READ);
     }
 
-    cp_wait_states: coverpoint trans.wait_cycles {
-      bins no_wait = {0}; bins short_wait = {[1 : 4]}; bins long_wait = {[5 : 10]};
+    cp_wait_state: coverpoint sample_wait_cycles {
+      bins no_wait = {0};
+      ignore_bins wait_not_enabled = {[1:32'hffff_ffff]};
     }
 
-    cp_pslverr: coverpoint trans.pslverr {bins no_error = {0}; bins error = {1};}
+    cp_response: coverpoint sample_pslverr {
+      bins no_error = {0};
+      illegal_bins unexpected_error = {1};
+    }
 
-    /*cp_wr_rd_same_addr : coverpoint was_written iff(trans.kind_e == READ) {
-bins written_before_read = {1};
-bins read_before_write   = {0};
-}*/
+    cross_kind_addr_region: cross cp_kind, cp_addr_region;
 
-    /*cp_reset : coverpoint trans.reset_seen {
-bins reset_asserted = {1};
-bins normal_op = {0};
-}*/
+  endgroup
 
-    cross_kind_addr  : cross cp_kind, cp_paddr;
+  covergroup apb_write_data_cg;
 
-    cross_kind_wait  : cross cp_kind, cp_wait_states;
+    option.per_instance = 1;
+    option.name = "apb_write_data_cg";
 
-    cross_kind_error : cross cp_kind, cp_pslverr;
+    cp_write_data: coverpoint sample_pwdata {
+      bins zero         = {DataZero};
+      bins low_range    = {[DataZero + 1'b1 : DataQ1Max]};
+      bins lowmid_range = {[DataQ1Max + 1'b1 : DataQ2Max]};
+      bins highmid_range = {[DataQ2Max + 1'b1 : DataQ3Max]};
+      bins high_range   = {[DataQ3Max + 1'b1 : DataMaxVal - 1'b1]};
+      bins max_value    = {DataMaxVal};
+    }
 
-    cross_addr_wait  : cross cp_paddr, cp_wait_states;
+  endgroup
 
-    cross_addr_data  : cross cp_paddr, cp_pwdata;
+  covergroup apb_read_data_cg;
 
-    //cross_wr_rd_wait : cross cp_wr_rd_same_addr, cp_wait_states;
+    option.per_instance = 1;
+    option.name = "apb_read_data_cg";
 
-    cross_kind_addr_error : cross cp_kind, cp_paddr, cp_pslverr;
+    cp_read_data: coverpoint sample_prdata {
+      bins zero         = {DataZero};
+      bins low_range    = {[DataZero + 1'b1 : DataQ1Max]};
+      bins lowmid_range = {[DataQ1Max + 1'b1 : DataQ2Max]};
+      bins highmid_range = {[DataQ2Max + 1'b1 : DataQ3Max]};
+      bins high_range   = {[DataQ3Max + 1'b1 : DataMaxVal - 1'b1]};
+      bins max_value    = {DataMaxVal};
+    }
+
   endgroup
 
   function new();
-    apb_cg = new();
+    apb_transfer_cg = new();
+    apb_write_data_cg = new();
+    apb_read_data_cg = new();
   endfunction
 
-  //REPORT
+  function void sample_coverage(apb_trans trans);
+
+    if (trans == null) begin
+      $warning("[COV] Null transaction sample ignored");
+      return;
+    end
+
+    last_trans = trans.clone();
+
+    sample_kind = last_trans.kind_e;
+    sample_paddr = last_trans.paddr;
+    sample_pwdata = last_trans.pwdata;
+    sample_prdata = last_trans.prdata;
+    sample_pslverr = last_trans.pslverr;
+    sample_wait_cycles = last_trans.wait_cycles;
+
+    total_samples++;
+    apb_transfer_cg.sample();
+
+    if (sample_kind == WRITE) begin
+      write_samples++;
+      apb_write_data_cg.sample();
+    end else begin
+      read_samples++;
+      apb_read_data_cg.sample();
+    end
+
+  endfunction
+
+  function real get_functional_coverage();
+
+    real transfer_cov;
+    real write_data_cov;
+    real read_data_cov;
+
+    transfer_cov = apb_transfer_cg.get_coverage();
+    write_data_cov = (write_samples > 0) ? apb_write_data_cg.get_coverage() : 100.0;
+    read_data_cov = (read_samples > 0) ? apb_read_data_cg.get_coverage() : 100.0;
+
+    return ((transfer_cov + write_data_cov + read_data_cov) / 3.0);
+
+  endfunction
+
   function void report();
+
     $display("======================================");
-    $display("FUNCTIONAL COVERAGE = %0.2f %% ", apb_cg.get_coverage());
+    $display("FUNCTIONAL COVERAGE = %0.2f %% ", get_functional_coverage());
+    $display("  Transfer coverage = %0.2f %%", apb_transfer_cg.get_coverage());
+    $display("  Write data coverage = %0.2f %%", apb_write_data_cg.get_coverage());
+    $display("  Read data coverage = %0.2f %%", apb_read_data_cg.get_coverage());
+    $display("  Samples total/write/read = %0d/%0d/%0d",
+             total_samples, write_samples, read_samples);
     $display("======================================");
+
   endfunction
 
 endclass

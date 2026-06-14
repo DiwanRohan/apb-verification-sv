@@ -34,7 +34,7 @@ class apb_env;
   mailbox #(apb_trans) ref2scb_mbx;
 
   //Build
-  function build();
+  function void build();
     drv = new();
     mon = new();
     rm = new();

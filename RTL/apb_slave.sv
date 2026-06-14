@@ -2,7 +2,6 @@
 `define APB_SLAVE_SV
 
 `include "apb_defines.sv"
-`include "apb_pkg.sv"
 
 module apb_slave (
 

@@ -40,7 +40,7 @@ module apb_tb_top;
 
     // notify reset starting
     ->apb_pkg::reset_start_ev;
-    apb_pkg : reset = 1;
+    apb_pkg::reset = 1;
 
     intf.prstn = 1'b0;
 

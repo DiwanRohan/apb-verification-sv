@@ -25,23 +25,14 @@ typedef enum bit {
 class apb_trans extends sv_sequence_item;
 
   // type of operation
-  bit psel;
-  bit penable;
-  bit pwrite;
-
   rand trans_kind_e kind_e;
 
   rand bit [`ADDR_WIDTH-1:0] paddr;
-  //This is drived using the driver so can be randomized in generator
-  rand
-  bit [`DATA_WIDTH-1:0]
-  pwdata;  //This is drived using the driver so can be randomized in generator
+  rand bit [`DATA_WIDTH-1:0] pwdata;
 
-  bit [`DATA_WIDTH-1:0] prdata;  //This is output so no rand
+  bit [`DATA_WIDTH-1:0] prdata;
   bit [`DATA_WIDTH-1:0] exp_prdata;
-  //This is determined in the reference model and is output so no rand
 
-  bit prstn = 1;
   bit pready;
   bit pslverr;
   int wait_cycles;
@@ -55,15 +46,11 @@ class apb_trans extends sv_sequence_item;
       return;
     end
 
-    this.psel       = t.psel;
-    this.penable    = t.penable;
-    this.pwrite     = t.pwrite;
     this.kind_e     = t.kind_e;
     this.paddr      = t.paddr;
     this.pwdata     = t.pwdata;
     this.prdata     = t.prdata;
     this.exp_prdata = t.exp_prdata;
-    this.prstn      = t.prstn;
     this.pready     = t.pready;
     this.pslverr    = t.pslverr;
 
@@ -95,11 +82,8 @@ class apb_trans extends sv_sequence_item;
     $display("--------------------------------------------------");
     $display("[%0t] %s", $time, id);
     $display("--------------------------------------------------");
-    $display("PSEL       = %0b", psel);
-    $display("PENABLE    = %0b", penable);
     $display("PREADY     = %0b", pready);
     $display("TRANS_KIND = %0s", kind_e);
-    //$display("PWRITE     = %0b", pwrite);
     $display("PADDR      = %0h", paddr);
 
     if (kind_e == WRITE) $display("PWDATA     = %0h", pwdata);

@@ -58,7 +58,7 @@ class apb_ref_model;
 
     //t.exp_prdata = prev_exp_prdata;
 
-    if (!t.prstn) begin
+    if (apb_pkg::reset) begin
 
       t.exp_prdata = 0;
 

@@ -38,12 +38,10 @@ class apb_monitor;
 
       @(vif.mon_cb);
 
-      if (vif.mon_cb.psel && vif.mon_cb.penable && vif.mon_cb.pready) begin
+      if (vif.mon_cb.psel && vif.mon_cb.penable) begin
 
         item_collected = new();
 
-        item_collected.psel    = vif.mon_cb.psel;
-        item_collected.penable = vif.mon_cb.penable;
         item_collected.pready  = vif.mon_cb.pready;
 
         item_collected.paddr   = vif.mon_cb.paddr;

@@ -87,28 +87,14 @@ class apb_driver;
       //WAIT STATES
       //HOLD SAME VALUES UNTIL PREADY=1
       //-------------------------------------------------
-      if (vif.drv_cb.pready !== 1'b1) begin
-
-        do begin
-
-          @(vif.drv_cb);
-
-          vif.drv_cb.psel    <= 1'b1;
-          vif.drv_cb.penable <= 1'b1;
-
-          vif.drv_cb.pwrite  <= trans.kind_e;
-          vif.drv_cb.paddr   <= trans.paddr;
-          vif.drv_cb.pwdata  <= trans.pwdata;
-
-        end while (vif.drv_cb.pready !== 1'b1);
-
-      end
+      do begin
+        @(vif.drv_cb);
+      end while (vif.drv_cb.pready !== 1'b1);
 
       //ERROR CHECK
       if (vif.drv_cb.pslverr) $display("[DRV] APB ERROR DETECTED ADDR=%0h", trans.paddr);
 
     end
-
   endtask
 
 endclass

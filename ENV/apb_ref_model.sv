@@ -60,12 +60,12 @@ class apb_ref_model;
 
     if (apb_pkg::reset) begin
 
-      t.exp_prdata = 0;
+      t.prdata = 0;
 
       for (i = 0; i < `DEPTH; i++) mem[i] = 0;
     end else begin
 
-      if (t.kind_e == READ) t.exp_prdata = mem[t.paddr];
+      if (t.kind_e == READ) t.prdata = mem[t.paddr];
 
       else mem[t.paddr] = t.pwdata;
     end

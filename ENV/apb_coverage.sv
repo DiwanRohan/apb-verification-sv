@@ -63,7 +63,10 @@ class apb_coverage;
 
     cp_wait_state: coverpoint sample_wait_cycles {
       bins no_wait = {0};
-      ignore_bins wait_not_enabled = {[1:32'hffff_ffff]};
+      bins wait_1  = {1};
+      bins wait_3  = {3};
+      bins wait_12 = {12};
+      bins others  = default;
     }
 
     cp_response: coverpoint sample_pslverr {

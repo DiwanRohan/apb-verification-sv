@@ -42,14 +42,14 @@ class apb_monitor;
 
         item_collected = new();
 
-        item_collected.pready  = vif.mon_cb.pready;
-
         item_collected.paddr   = vif.mon_cb.paddr;
         item_collected.kind_e  = vif.mon_cb.pwrite ? WRITE : READ;
         item_collected.pslverr = vif.mon_cb.pslverr;
 
-        while (vif.mon_cb.psel && vif.mon_cb.penable && !vif.mon_cb.pready)
-        item_collected.wait_cycles++;
+        while (vif.mon_cb.psel && vif.mon_cb.penable && !vif.mon_cb.pready) begin
+          item_collected.wait_cycles++;
+          @(vif.mon_cb);
+        end
 
         if (item_collected.wait_cycles > 0)
           $display("Wait Cycles started and count = %0d", item_collected.wait_cycles);

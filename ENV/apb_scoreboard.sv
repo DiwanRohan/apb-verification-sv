@@ -85,12 +85,12 @@ class apb_scoreboard;
   task compare(apb_trans act_tr, apb_trans exp_tr);
     if (act_tr.kind_e == READ) begin
 
-      if (act_tr.prdata === exp_tr.exp_prdata) begin
+      if (act_tr.prdata === exp_tr.prdata) begin
         pass_cnt++;
-        //$display("[SCB PASS] PRDATA=%0d EXPECTED=%0d", act_tr.prdata,exp_tr.exp_prdata);
+        //$display("[SCB PASS] PRDATA=%0d EXPECTED=%0d", act_tr.prdata,exp_tr.prdata);
       end else begin
         fail_cnt++;
-        $display("[SCB FAIL] PRDATA=%0d EXPECTED=%0d", act_tr.prdata, exp_tr.exp_prdata);
+        $display("[SCB FAIL] PRDATA=%0d EXPECTED=%0d", act_tr.prdata, exp_tr.prdata);
         //exp.print("SCB_EXP");
         //act.print("SCB_ACT");
       end

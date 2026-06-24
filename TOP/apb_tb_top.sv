@@ -34,6 +34,9 @@ module apb_tb_top;
       .pslverr(intf.pslverr)
   );
 
+  // Bind assertions to the apb_slave module
+  bind apb_slave apb_assertions apb_assert_inst (.*);
+
   task static apply_reset(int count);
 
     $display("[%0t] APPLYING RESET", $time);

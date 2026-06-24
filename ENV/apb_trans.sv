@@ -31,9 +31,7 @@ class apb_trans extends sv_sequence_item;
   rand bit [`DATA_WIDTH-1:0] pwdata;
 
   bit [`DATA_WIDTH-1:0] prdata;
-  bit [`DATA_WIDTH-1:0] exp_prdata;
 
-  bit pready;
   bit pslverr;
   int wait_cycles;
 
@@ -50,8 +48,6 @@ class apb_trans extends sv_sequence_item;
     this.paddr      = t.paddr;
     this.pwdata     = t.pwdata;
     this.prdata     = t.prdata;
-    this.exp_prdata = t.exp_prdata;
-    this.pready     = t.pready;
     this.pslverr    = t.pslverr;
 
   endfunction
@@ -82,7 +78,6 @@ class apb_trans extends sv_sequence_item;
     $display("--------------------------------------------------");
     $display("[%0t] %s", $time, id);
     $display("--------------------------------------------------");
-    $display("PREADY     = %0b", pready);
     $display("TRANS_KIND = %0s", kind_e);
     $display("PADDR      = %0h", paddr);
 

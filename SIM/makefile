@@ -7,6 +7,7 @@ TOP_DIR  = ../TOP
 # ===== FILES =====
 RTL = $(RTL_DIR)/apb_slave.sv
 PKG = $(TEST_DIR)/apb_pkg.sv
+ASSERTIONS = $(ENV_DIR)/apb_assertions.sv
 TOP = $(TOP_DIR)/apb_tb_top.sv
 # ===== TOP MODULE =====
 TOP_MODULE = apb_tb_top
@@ -31,7 +32,7 @@ comp: lib
 	+incdir+../ENV \
 	+incdir+../TEST \
 	+incdir+../TOP \
-	$(RTL) $(PKG) $(TOP)
+	$(RTL) $(PKG) $(ASSERTIONS) $(TOP)
 
 # ===== RUN (CLI) =====
 run: comp

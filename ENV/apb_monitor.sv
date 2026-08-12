@@ -44,6 +44,7 @@ class apb_monitor;
 
         item_collected.paddr   = vif.mon_cb.paddr;
         item_collected.kind_e  = vif.mon_cb.pwrite ? WRITE : READ;
+        item_collected.pstrb   = vif.mon_cb.pstrb;
         item_collected.pslverr = vif.mon_cb.pslverr;
 
         while (vif.mon_cb.psel && vif.mon_cb.penable && !vif.mon_cb.pready) begin

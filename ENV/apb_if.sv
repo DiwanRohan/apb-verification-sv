@@ -33,6 +33,7 @@ interface apb_if (
   logic [`ADDR_WIDTH-1:0] paddr;
   logic [`DATA_WIDTH-1:0] pwdata;
   logic [`DATA_WIDTH-1:0] prdata;
+  logic [(`DATA_WIDTH/8)-1:0] pstrb;
 
   //APB SLAVE SIGNALS
   logic                   pready;
@@ -53,6 +54,7 @@ interface apb_if (
 
     output paddr;
     output pwdata;
+    output pstrb;
 
     //SAMPLED FROM DUT
     input prdata;
@@ -74,6 +76,7 @@ interface apb_if (
 
     input paddr;
     input pwdata;
+    input pstrb;
 
     input prdata;
     input pready;

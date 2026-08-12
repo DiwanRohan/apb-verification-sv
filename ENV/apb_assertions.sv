@@ -24,6 +24,7 @@ module apb_assertions (
     input logic                   pwrite,
     input logic [`ADDR_WIDTH-1:0] paddr,
     input logic [`DATA_WIDTH-1:0] pwdata,
+    input logic [(`DATA_WIDTH/8)-1:0] pstrb,
     input logic [`DATA_WIDTH-1:0] prdata,
     input logic                   pready,
     input logic                   pslverr
@@ -151,6 +152,26 @@ module apb_assertions (
 
   assert property (p_idle_state_valid)
   else $error("APB ASSERTION FAILED : Invalid IDLE state");
+
+  //Assertion 13
+  //PSTRB must be stable during pready is low and in ACCESS state
+  property p_pstrb_stable_wait;
+    @(posedge pclk) disable iff (!prstn) (psel && penable && !pready && pwrite) |-> $stable(
+        pstrb
+    );
+  endproperty
+
+  assert property (p_pstrb_stable_wait)
+  else $error("APB ASSERTION FAILED : PSTRB changed during write wait state");
+
+  //Assertion 14
+  //PSTRB must not contain unknown bits during active write transfer
+  property p_no_unknown_pstrb;
+    @(posedge pclk) disable iff (!prstn) (psel && pwrite) |-> !$isunknown(pstrb);
+  endproperty
+
+  assert property (p_no_unknown_pstrb)
+  else $error("APB ASSERTION FAILED : Unknown value detected on PSTRB during write");
 
 endmodule
 

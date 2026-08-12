@@ -68,8 +68,7 @@ class apb_scoreboard;
         act = act_q.pop_front();
         exp = exp_q.pop_front();
 
-        //if(act.prdata !== 0 && exp.exp_prdata !== 0)
-        if (act.kind_e == READ) compare(act, exp);
+        compare(act, exp);
 
         //this.act.print("SCB");
 
@@ -83,16 +82,31 @@ class apb_scoreboard;
 
   //Function to compare expected and actual value
   task compare(apb_trans act_tr, apb_trans exp_tr);
+    // 1. Compare PRDATA for read transfers
     if (act_tr.kind_e == READ) begin
-
       if (act_tr.prdata === exp_tr.prdata) begin
         pass_cnt++;
-        //$display("[SCB PASS] PRDATA=%0d EXPECTED=%0d", act_tr.prdata,exp_tr.prdata);
       end else begin
         fail_cnt++;
-        $display("[SCB FAIL] PRDATA=%0d EXPECTED=%0d", act_tr.prdata, exp_tr.prdata);
-        //exp.print("SCB_EXP");
-        //act.print("SCB_ACT");
+        $display("[SCB FAIL] PRDATA Mismatch: ADDR=%0h Actual=%0h Expected=%0h", act_tr.paddr, act_tr.prdata, exp_tr.prdata);
+      end
+    end
+
+    // 2. Compare PSLVERR for all transfers
+    if (act_tr.pslverr === exp_tr.pslverr) begin
+      pass_cnt++;
+    end else begin
+      fail_cnt++;
+      $display("[SCB FAIL] PSLVERR Mismatch: ADDR=%0h Actual=%0b Expected=%0b", act_tr.paddr, act_tr.pslverr, exp_tr.pslverr);
+    end
+
+    // 3. Compare PSTRB for write transfers
+    if (act_tr.kind_e == WRITE) begin
+      if (act_tr.pstrb === exp_tr.pstrb) begin
+        pass_cnt++;
+      end else begin
+        fail_cnt++;
+        $display("[SCB FAIL] PSTRB Mismatch: ADDR=%0h Actual=%0b Expected=%0b", act_tr.paddr, act_tr.pstrb, exp_tr.pstrb);
       end
     end
 

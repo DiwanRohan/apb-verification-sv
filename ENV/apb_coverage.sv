@@ -24,6 +24,7 @@ class apb_coverage;
   bit [`ADDR_WIDTH-1:0] sample_paddr;
   bit [`DATA_WIDTH-1:0] sample_pwdata;
   bit [`DATA_WIDTH-1:0] sample_prdata;
+  bit [(`DATA_WIDTH/8)-1:0] sample_pstrb;
   bit sample_pslverr;
   int unsigned sample_wait_cycles;
 
@@ -71,7 +72,7 @@ class apb_coverage;
 
     cp_response: coverpoint sample_pslverr {
       bins no_error = {0};
-      illegal_bins unexpected_error = {1};
+      bins error_resp = {1};
     }
 
     cross_kind_addr_region: cross cp_kind, cp_addr_region;
@@ -90,6 +91,13 @@ class apb_coverage;
       bins highmid_range = {[DataQ2Max + 1'b1 : DataQ3Max]};
       bins high_range   = {[DataQ3Max + 1'b1 : DataMaxVal - 1'b1]};
       bins max_value    = {DataMaxVal};
+    }
+
+    cp_pstrb: coverpoint sample_pstrb {
+      bins all_bytes_enabled = {4'b1111};
+      bins single_byte_enabled[] = {4'b0001, 4'b0010, 4'b0100, 4'b1000};
+      bins half_word_enabled[] = {4'b0011, 4'b1100};
+      bins other_patterns = default;
     }
 
   endgroup
@@ -129,6 +137,7 @@ class apb_coverage;
     sample_paddr = last_trans.paddr;
     sample_pwdata = last_trans.pwdata;
     sample_prdata = last_trans.prdata;
+    sample_pstrb = last_trans.pstrb;
     sample_pslverr = last_trans.pslverr;
     sample_wait_cycles = last_trans.wait_cycles;
 

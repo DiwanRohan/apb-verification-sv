@@ -39,18 +39,19 @@ class apb_ref_model;
 
   //Run function
   task run();
-
-    forever begin
-
-      mon2ref_mbx.get(trans);
-
-      predict_exp_prdata(trans);
-
-      ref2scb_mbx.put(trans.clone());
-
-      //this.trans.print("REFERENCE MODEL");
-
-    end
+    fork
+      forever begin
+        mon2ref_mbx.get(trans);
+        predict_exp_prdata(trans);
+        ref2scb_mbx.put(trans.clone());
+        //this.trans.print("REFERENCE MODEL");
+      end
+      forever begin
+        @(apb_pkg::reset_start_ev);
+        $display("[%0t] [REF] Reset detected, clearing reference memory", $time);
+        for (i = 0; i < `DEPTH; i++) mem[i] = 0;
+      end
+    join
   endtask
 
   //Predicting expected prdata
@@ -59,15 +60,22 @@ class apb_ref_model;
     //t.exp_prdata = prev_exp_prdata;
 
     if (apb_pkg::reset) begin
-
       t.prdata = 0;
-
+      t.pslverr = 0;
       for (i = 0; i < `DEPTH; i++) mem[i] = 0;
     end else begin
-
-      if (t.kind_e == READ) t.prdata = mem[t.paddr];
-
-      else mem[t.paddr] = t.pwdata;
+      t.pslverr = (t.paddr >= `DEPTH);
+      if (t.kind_e == READ) begin
+        if (t.paddr < `DEPTH) t.prdata = mem[t.paddr];
+        else t.prdata = '0;
+      end else begin
+        if (t.paddr < `DEPTH) begin
+          if (t.pstrb[0]) mem[t.paddr][7:0]   = t.pwdata[7:0];
+          if (t.pstrb[1]) mem[t.paddr][15:8]  = t.pwdata[15:8];
+          if (t.pstrb[2]) mem[t.paddr][23:16] = t.pwdata[23:16];
+          if (t.pstrb[3]) mem[t.paddr][31:24] = t.pwdata[31:24];
+        end
+      end
     end
   endtask
 

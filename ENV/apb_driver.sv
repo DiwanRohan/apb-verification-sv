@@ -56,8 +56,21 @@ class apb_driver;
       first_transfer = 0;
     end
 
-    //RESET CONDITION
-    if (apb_pkg::reset) begin
+    if (trans.kind_e == RESET) begin
+      $display("[%0t] [DRV] DRIVER INITIATED RESET ASSERTION", $time);
+      apb_pkg::reset = 1;
+      vif.drv_cb.prstn   <= 1'b0;
+      vif.drv_cb.psel    <= 1'b0;
+      vif.drv_cb.penable <= 1'b0;
+      vif.drv_cb.paddr   <= '0;
+      vif.drv_cb.pwdata  <= '0;
+      vif.drv_cb.pstrb   <= '0;
+      vif.drv_cb.pwrite  <= 1'b0;
+      repeat (2) @(vif.drv_cb);
+      vif.drv_cb.prstn   <= 1'b1;
+      apb_pkg::reset = 0;
+      $display("[%0t] [DRV] DRIVER DEASSERTED RESET", $time);
+    end else if (apb_pkg::reset) begin
       vif.drv_cb.psel    <= 1'b0;
       vif.drv_cb.penable <= 1'b0;
     end else begin
@@ -70,9 +83,10 @@ class apb_driver;
       vif.drv_cb.psel    <= 1'b1;
       vif.drv_cb.penable <= 1'b0;
 
-      vif.drv_cb.pwrite  <= trans.kind_e;
+      vif.drv_cb.pwrite  <= (trans.kind_e == WRITE);
       vif.drv_cb.paddr   <= trans.paddr;
       vif.drv_cb.pwdata  <= trans.pwdata;
+      vif.drv_cb.pstrb   <= (trans.kind_e == WRITE) ? trans.pstrb : '0;
 
 
       //-------------------------------------------------

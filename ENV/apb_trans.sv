@@ -16,9 +16,10 @@
 
 `include "apb_defines.sv"
 
-typedef enum bit {
-  WRITE = 1'b1,
-  READ  = 1'b0
+typedef enum bit [1:0] {
+  READ  = 2'b00,
+  WRITE = 2'b01,
+  RESET = 2'b10
 } trans_kind_e;
 
 //Child class consisting all the methods of class sv_sequence_item which are copy, clone, print
@@ -29,6 +30,11 @@ class apb_trans extends sv_sequence_item;
 
   rand bit [`ADDR_WIDTH-1:0] paddr;
   rand bit [`DATA_WIDTH-1:0] pwdata;
+  rand bit [(`DATA_WIDTH/8)-1:0] pstrb;
+
+  constraint valid_pstrb {
+    pstrb inside {[1:15]};
+  }
 
   bit [`DATA_WIDTH-1:0] prdata;
 
@@ -47,6 +53,7 @@ class apb_trans extends sv_sequence_item;
     this.kind_e     = t.kind_e;
     this.paddr      = t.paddr;
     this.pwdata     = t.pwdata;
+    this.pstrb      = t.pstrb;
     this.prdata     = t.prdata;
     this.pslverr    = t.pslverr;
 
@@ -81,7 +88,10 @@ class apb_trans extends sv_sequence_item;
     $display("TRANS_KIND = %0s", kind_e);
     $display("PADDR      = %0h", paddr);
 
-    if (kind_e == WRITE) $display("PWDATA     = %0h", pwdata);
+    if (kind_e == WRITE) begin
+      $display("PWDATA     = %0h", pwdata);
+      $display("PSTRB      = %0b", pstrb);
+    end
     else $display("PRDATA     = %0h", prdata);
 
     $display("PSLVERR    = %0b", pslverr);

@@ -29,6 +29,7 @@ module apb_tb_top;
       .paddr  (intf.paddr),
       .pwrite (intf.pwrite),
       .pwdata (intf.pwdata),
+      .pstrb  (intf.pstrb),
       .prdata (intf.prdata),
       .pready (intf.pready),
       .pslverr(intf.pslverr)
@@ -52,6 +53,7 @@ module apb_tb_top;
     intf.paddr   = 0;
     intf.pwrite  = 0;
     intf.pwdata  = 0;
+    intf.pstrb   = 0;
     //intf.pready  = `DEFAULT_PREADY;
     //intf.pslverr = 0;
 

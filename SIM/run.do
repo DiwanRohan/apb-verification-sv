@@ -48,14 +48,14 @@ add wave -r /*
 radix hex
 
 # -------------------------
+# SAVE COVERAGE ON EXIT
+# -------------------------
+coverage save -onexit apb_cov.ucdb
+
+# -------------------------
 # RUN SIMULATION
 # -------------------------
 run -all
-
-# -------------------------
-# SAVE COVERAGE
-# -------------------------
-coverage save apb_cov.ucdb
 
 # -------------------------
 # HTML COVERAGE REPORT

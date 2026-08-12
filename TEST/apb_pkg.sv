@@ -45,11 +45,13 @@ package apb_pkg;
   //testcases
   `include "apb_gen_base.sv"
   `include "apb_rand_xtn.svh"
-  `include "apb_directed_xtn.svh"
+  `include "apb_sanity_xtn.svh"
   `include "apb_boundary_xtn.svh"
   `include "apb_transition_xtn.svh"
   `include "apb_wr_rd_same_xtn.svh"
   `include "apb_cov_xtn.svh"
+  `include "apb_reset_xtn.svh"
+  `include "apb_error_xtn.svh"
 
 
   //components

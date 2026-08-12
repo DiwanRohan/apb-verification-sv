@@ -17,11 +17,13 @@ class apb_base_test;
   apb_env                 env;
 
   apb_rand_xtn            randxtn;
-  apb_directed_xtn        dirxtn;
+  apb_sanity_xtn          sanityxtn;
   apb_boundary_xtn        boundxtn;
   apb_transition_xtn      transxtn;
   apb_wr_rd_same_addr_xtn wrsamextn;
   apb_cov_xtn             covxtn;
+  apb_reset_xtn           resetxtn;
+  apb_error_xtn           errorxtn;
 
   //Function connect
   function void connect(virtual apb_if vif);
@@ -40,7 +42,7 @@ class apb_base_test;
 
     `SV_DO_ON(APB_RAND_TEST, randxtn);
 
-    `SV_DO_ON(APB_DIRECTED_TEST, dirxtn);
+    `SV_DO_ON(APB_SANITY_TEST, sanityxtn);
 
     `SV_DO_ON(APB_BOUNDARY_TEST, boundxtn);
 
@@ -49,6 +51,10 @@ class apb_base_test;
     `SV_DO_ON(APB_WR_RD_SAME_TEST, wrsamextn);
 
     `SV_DO_ON(APB_COV_TEST, covxtn);
+
+    `SV_DO_ON(APB_RESET_TEST, resetxtn);
+
+    `SV_DO_ON(APB_ERROR_TEST, errorxtn);
 
   endfunction
 

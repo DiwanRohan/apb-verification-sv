@@ -11,6 +11,7 @@ module apb_slave (
   input  logic [`ADDR_WIDTH-1:0] paddr,
   input  logic                   pwrite,
   input  logic [`DATA_WIDTH-1:0] pwdata,
+  input  logic [(`DATA_WIDTH/8)-1:0] pstrb,
   output logic                   pready,
   output logic [`DATA_WIDTH-1:0] prdata,
   output logic                   pslverr
@@ -27,7 +28,10 @@ module apb_slave (
         mem[i] <= '0;
     end
     else if (psel && penable && pready && pwrite && (paddr < `DEPTH)) begin
-      mem[paddr] <= pwdata;
+      if (pstrb[0]) mem[paddr][7:0]   <= pwdata[7:0];
+      if (pstrb[1]) mem[paddr][15:8]  <= pwdata[15:8];
+      if (pstrb[2]) mem[paddr][23:16] <= pwdata[23:16];
+      if (pstrb[3]) mem[paddr][31:24] <= pwdata[31:24];
     end
   end
 
